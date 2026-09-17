@@ -41,13 +41,6 @@ public class BlockListPanel {
             blockManager.addBlock(block);
             refresh();
         }));
-        Button toggle = new Button("Enable / disable");
-        toggle.getStyleClass().add("secondary-button");
-        toggle.setOnAction(event -> {
-            Block block = list.getSelectionModel().getSelectedItem();
-            if (block != null) block.setActive(!block.isActive());
-            refresh();
-        });
         Button delete = new Button("Delete selected");
         delete.getStyleClass().add("secondary-button");
         delete.setOnAction(event -> {
@@ -55,7 +48,7 @@ public class BlockListPanel {
             if (block != null) blockManager.removeBlock(block);
             refresh();
         });
-        HBox actions = new HBox(10, create, toggle, delete);
+        HBox actions = new HBox(10, create, delete);
         actions.setAlignment(Pos.CENTER_LEFT);
         return actions;
     }

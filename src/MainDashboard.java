@@ -2,15 +2,23 @@ import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
+import javafx.scene.Group;
 import javafx.scene.Node;
 import javafx.scene.control.Label;
 import javafx.scene.control.ToggleButton;
 import javafx.scene.control.ToggleGroup;
 import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
+import javafx.scene.paint.Color;
+import javafx.scene.shape.Arc;
+import javafx.scene.shape.ArcType;
+import javafx.scene.shape.Circle;
+import javafx.scene.shape.Line;
+import javafx.scene.shape.Polygon;
 import javafx.util.Duration;
 
 public class MainDashboard {
@@ -27,11 +35,11 @@ public class MainDashboard {
         this.economy = economy;
         root.getStyleClass().add("root");
         root.setLeft(createSidebar());
-        root.setTop(createTopBar());
         root.setCenter(content);
         showPage("Dashboard", createDashboard());
+
         Timeline refresh = new Timeline(new KeyFrame(Duration.seconds(1), event ->
-                coinLabel.setText("🍋 " + economy.getCoins() + " coins")));
+                coinLabel.setText(String.valueOf(economy.getCoins()))));
         refresh.setCycleCount(Timeline.INDEFINITE);
         refresh.play();
     }
@@ -41,17 +49,23 @@ public class MainDashboard {
     private VBox createSidebar() {
         VBox sidebar = new VBox();
         sidebar.getStyleClass().add("sidebar");
-        Label brand = new Label("Citrus");
-        brand.getStyleClass().add("brand");
+
+        HBox brandRow = new HBox(10, createLemonLogo(32), new Label("Citrus"));
+        brandRow.setAlignment(Pos.CENTER_LEFT);
+        brandRow.getStyleClass().add("brand-row");
+        brandRow.lookupAll(".label").forEach(node -> node.getStyleClass().add("brand"));
+
         Label tagline = new Label("Digital detox, made simple");
         tagline.getStyleClass().add("muted");
         VBox.setMargin(tagline, new Insets(0, 0, 26, 0));
+
         ToggleButton dashboard = navButton("⌂  Dashboard", true, () -> showPage("Dashboard", createDashboard()));
         ToggleButton blocks = navButton("◫  My Blocks", false, () -> showPage("My Blocks", new BlockListPanel(blockManager).getView()));
         ToggleButton shop = navButton("◈  Shop", false, () -> showPage("Shop", new ShopPanel(blockManager, economy).getView()));
         ToggleButton statistics = navButton("↗  Statistics", false, () -> showPage("Statistics", new StatisticsPanel(blockManager, economy).getView()));
         ToggleButton settings = navButton("⚙  Settings", false, () -> showPage("Settings", new SettingsPanel(economy).getView()));
-        sidebar.getChildren().addAll(brand, tagline, dashboard, blocks, shop, statistics);
+
+        sidebar.getChildren().addAll(brandRow, tagline, dashboard, blocks, shop, statistics);
         VBox spacer = new VBox();
         VBox.setVgrow(spacer, Priority.ALWAYS);
         sidebar.getChildren().addAll(spacer, settings);
@@ -68,22 +82,76 @@ public class MainDashboard {
         return button;
     }
 
-    private HBox createTopBar() {
-        HBox topBar = new HBox(14);
-        topBar.getStyleClass().add("top-bar");
-        topBar.setAlignment(Pos.CENTER_LEFT);
+    private Node createPageFrame(String title, Node page) {
+        VBox frame = new VBox(18);
+        frame.getStyleClass().add("page-frame");
+
+        HBox header = new HBox(14);
+        header.setAlignment(Pos.CENTER_LEFT);
+        pageTitle.setText(title);
         pageTitle.getStyleClass().add("page-title");
-        coinLabel.getStyleClass().add("coin-chip");
-        coinLabel.setText("🍋 " + economy.getCoins() + " coins");
         HBox spacer = new HBox();
         HBox.setHgrow(spacer, Priority.ALWAYS);
-        topBar.getChildren().addAll(pageTitle, spacer, coinLabel);
-        return topBar;
+        header.getChildren().addAll(pageTitle, spacer, createCoinDisplay());
+
+        VBox.setVgrow(page, Priority.ALWAYS);
+        frame.getChildren().addAll(header, page);
+        return frame;
+    }
+
+    private HBox createCoinDisplay() {
+        HBox display = new HBox(9, createCoinIcon(22), coinLabel, new Label("coins"));
+        display.setAlignment(Pos.CENTER);
+        display.getStyleClass().add("coin-chip");
+        coinLabel.getStyleClass().add("coin-value");
+        display.getChildren().get(2).getStyleClass().add("coin-caption");
+        return display;
     }
 
     private void showPage(String title, Node page) {
-        pageTitle.setText(title);
-        content.getChildren().setAll(page);
+        content.getChildren().setAll(createPageFrame(title, page));
+    }
+
+    private Node createLemonLogo(double size) {
+        double radius = size / 2;
+        Circle rind = new Circle(radius, Color.web("#FDCC21"));
+        rind.setStroke(Color.web("#E0A900"));
+        rind.setStrokeWidth(2);
+        Circle flesh = new Circle(radius * 0.78, Color.web("#FFF8D9"));
+        flesh.setStroke(Color.web("#FFFFFF"));
+        flesh.setStrokeWidth(1.5);
+
+        Group segments = new Group();
+        for (int i = 0; i < 6; i++) {
+            Arc segment = new Arc(0, 0, radius * 0.68, radius * 0.68, i * 60 + 4, 52);
+            segment.setType(ArcType.ROUND);
+            segment.setFill(Color.web(i % 2 == 0 ? "#F8C51A" : "#FFE578"));
+            segments.getChildren().add(segment);
+        }
+        StackPane logo = new StackPane(rind, flesh, segments);
+        logo.setPrefSize(size, size);
+        logo.setMinSize(size, size);
+        logo.setMaxSize(size, size);
+        return logo;
+    }
+
+    private Node createCoinIcon(double size) {
+        double radius = size / 2;
+        Circle coin = new Circle(radius, Color.web("#FDCC21"));
+        coin.setStroke(Color.web("#B98200"));
+        coin.setStrokeWidth(1.5);
+        Circle innerRing = new Circle(radius * 0.68, Color.TRANSPARENT);
+        innerRing.setStroke(Color.web("#FFF8D9"));
+        innerRing.setStrokeWidth(1.5);
+        Polygon sparkle = new Polygon(0, -radius * 0.38, radius * 0.1, -radius * 0.1,
+                radius * 0.38, 0, radius * 0.1, radius * 0.1, 0, radius * 0.38,
+                -radius * 0.1, radius * 0.1, -radius * 0.38, 0, -radius * 0.1, -radius * 0.1);
+        sparkle.setFill(Color.web("#FFF8D9"));
+        StackPane icon = new StackPane(coin, innerRing, sparkle);
+        icon.setPrefSize(size, size);
+        icon.setMinSize(size, size);
+        icon.setMaxSize(size, size);
+        return icon;
     }
 
     private Node createDashboard() {
