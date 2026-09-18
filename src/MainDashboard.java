@@ -160,11 +160,13 @@ public class MainDashboard {
         metrics.getChildren().addAll(metricCard("Productive time", "time"), metricCard("Blocks active now", "blocks"),
                 staticCard("Daily goal", "2h 0m", "A gentle target for today"));
         TutorialContent tutorial = new TutorialContent();
-        view.getChildren().addAll(subtitle, metrics, tutorial.getView());
+        TopAppsAnalytics analytics = new TopAppsAnalytics(economy);
+        view.getChildren().addAll(subtitle, metrics, tutorial.getView(), analytics.getView());
         Timeline refresh = new Timeline(new KeyFrame(Duration.seconds(1), event -> {
             int minutes = (int) economy.getTotalProductiveMinutes();
             ((Label) metrics.lookup("#time")).setText((minutes / 60) + "h " + (minutes % 60) + "m");
             ((Label) metrics.lookup("#blocks")).setText(String.valueOf(blockManager.countActiveBlocks()));
+            analytics.refresh();
         }));
         refresh.setCycleCount(Timeline.INDEFINITE);
         refresh.play();
