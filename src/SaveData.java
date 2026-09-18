@@ -1,6 +1,7 @@
 import java.io.Serializable;
 import java.util.List;
 import java.util.Map;
+import java.time.LocalDate;
 
 public class SaveData implements Serializable {
     private static final long serialVersionUID = 1L;
@@ -14,10 +15,11 @@ public class SaveData implements Serializable {
     private double lifetimeProductiveSeconds;
     private boolean hasLifetimeProductiveSeconds;
     private int secondsPerCoin;
+    private LocalDate coinResetDate;
 
     public SaveData(List<Block> blocks, List<Pass> passes, Map<String, Long> usageSeconds, Map<String, Integer> triggerCounts, int coins,
                     double totalProductiveSeconds, double dailyProductiveSeconds,
-                    double lifetimeProductiveSeconds, int secondsPerCoin) {
+                    double lifetimeProductiveSeconds, int secondsPerCoin, LocalDate coinResetDate) {
         this.blocks = blocks;
         this.passes = passes;
         this.usageSeconds = usageSeconds;
@@ -28,6 +30,7 @@ public class SaveData implements Serializable {
         this.lifetimeProductiveSeconds = lifetimeProductiveSeconds;
         this.hasLifetimeProductiveSeconds = true;
         this.secondsPerCoin = secondsPerCoin;
+        this.coinResetDate = coinResetDate;
     }
 
     public List<Block> getBlocks() { return blocks; }
@@ -40,4 +43,5 @@ public class SaveData implements Serializable {
     public boolean hasLifetimeProductiveSeconds() { return hasLifetimeProductiveSeconds; }
     public double getLifetimeProductiveSeconds() { return lifetimeProductiveSeconds; }
     public int getSecondsPerCoin() { return secondsPerCoin; }
+    public LocalDate getCoinResetDate() { return coinResetDate; }
 }

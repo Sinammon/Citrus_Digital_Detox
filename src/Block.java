@@ -41,6 +41,9 @@ public class Block implements Serializable {
     public void setActive(boolean active) { this.active = active; }
     public LocalDateTime getUnlockAt() { return unlockAt; }
     public void setUnlockAt(LocalDateTime unlockAt) { this.unlockAt = unlockAt; }
+    public boolean isTimerExpired() {
+        return lockType == LockType.TIMER && unlockAt != null && !LocalDateTime.now().isBefore(unlockAt);
+    }
     public LocalTime getRangeStart() { return rangeStart; }
     public void setRangeStart(LocalTime rangeStart) { this.rangeStart = rangeStart; }
     public LocalTime getRangeEnd() { return rangeEnd; }

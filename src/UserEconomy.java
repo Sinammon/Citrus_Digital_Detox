@@ -8,6 +8,7 @@ public class UserEconomy {
     private double lifetimeProductiveSeconds;
     private int secondsPerCoin = 360;
     private LocalDate dailyMetricDate = LocalDate.now();
+    private LocalDate coinResetDate = LocalDate.now();
 
     public UserEconomy() {
         this.coins = 0;
@@ -18,6 +19,7 @@ public class UserEconomy {
 
     public synchronized void addProductiveTime(double seconds) {
         if (seconds <= 0) return;
+        resetCoinsIfNewDay();
         resetDailyMetricIfNeeded();
         this.totalProductiveSeconds += seconds;
         this.dailyProductiveSeconds += seconds;
@@ -41,6 +43,17 @@ public class UserEconomy {
     }
 
     public synchronized void setCoins(int coins) { this.coins = Math.max(0, coins); }
+    public synchronized LocalDate getCoinResetDate() { return coinResetDate; }
+    public synchronized void setCoinResetDate(LocalDate date) { coinResetDate = date == null ? LocalDate.now() : date; }
+    public synchronized boolean resetCoinsIfNewDay() {
+        LocalDate today = LocalDate.now();
+        if (coinResetDate == null || !today.equals(coinResetDate)) {
+            coins = 0;
+            coinResetDate = today;
+            return true;
+        }
+        return false;
+    }
     public synchronized double getTotalProductiveSecondsRaw() { resetDailyMetricIfNeeded(); return totalProductiveSeconds; }
     public synchronized void setTotalProductiveSecondsRaw(double seconds) {
         this.totalProductiveSeconds = Math.max(0, seconds);
@@ -61,6 +74,7 @@ public class UserEconomy {
         totalProductiveSeconds = 0;
         dailyProductiveSeconds = 0;
         dailyMetricDate = LocalDate.now();
+        resetCoinsIfNewDay();
     }
 
     private void resetDailyMetricIfNeeded() {

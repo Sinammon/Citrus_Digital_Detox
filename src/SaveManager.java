@@ -7,7 +7,7 @@ public class SaveManager {
         SaveData data = new SaveData(
                 blockManager.getBlocks(), blockManager.getPasses(), blockManager.getUsageSeconds(), blockManager.getTriggerCounts(),
                 economy.getCoins(), economy.getTotalProductiveSecondsRaw(), economy.getDailyProductiveSeconds(),
-                economy.getLifetimeProductiveSeconds(), economy.getSecondsPerCoin());
+                economy.getLifetimeProductiveSeconds(), economy.getSecondsPerCoin(), economy.getCoinResetDate());
         try (ObjectOutputStream out = new ObjectOutputStream(new FileOutputStream(FILE_NAME))) {
             out.writeObject(data);
         } catch (IOException e) { e.printStackTrace(); }
@@ -23,6 +23,8 @@ public class SaveManager {
             blockManager.setUsageSeconds(data.getUsageSeconds());
             blockManager.setTriggerCounts(data.getTriggerCounts());
             economy.setCoins(data.getCoins());
+            economy.setCoinResetDate(data.getCoinResetDate());
+            economy.resetCoinsIfNewDay();
             economy.setTotalProductiveSecondsRaw(data.getTotalProductiveSeconds());
             economy.setDailyProductiveSeconds(data.getDailyProductiveSeconds());
             economy.setSecondsPerCoin(data.getSecondsPerCoin());

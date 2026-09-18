@@ -15,6 +15,8 @@ import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
+import javafx.scene.shape.Arc;
+import javafx.scene.shape.ArcType;
 import javafx.scene.shape.Rectangle;
 import javafx.util.Duration;
 
@@ -56,7 +58,7 @@ public class BlockListPanel {
             if (empty || block == null) { setGraphic(null); return; }
             boolean locked = block.isCurrentlyBlocking();
             boolean bypassed = blockManager.isBypassedWithPass(block);
-            String state = bypassed ? "Unlocked block with pass" : locked ? "Locked" : block.isActive() ? "Enabled" : "Disabled";
+            String state = bypassed ? "Unlocked block with pass" : locked ? "Locked" : block.isTimerExpired() ? "Disabled" : block.isActive() ? "Enabled" : "Disabled";
             Label title = new Label(titleCase(block.getTargetName())); title.getStyleClass().add("section-title");
             Label status = new Label(state + " • " + titleCase(block.getLockType().name().replace('_', ' '))); status.getStyleClass().add("muted");
             HBox details = new HBox(12, createClosedLockIcon(), new VBox(4, title, status)); details.setAlignment(Pos.CENTER_LEFT);
@@ -68,8 +70,9 @@ public class BlockListPanel {
     private Node createClosedLockIcon() {
         Rectangle body = new Rectangle(26, 20, Color.web("#FFAD32"));
         body.setArcWidth(7); body.setArcHeight(7);
-        Circle shackle = new Circle(10, Color.TRANSPARENT);
-        shackle.setStroke(Color.web("#AAB7C0")); shackle.setStrokeWidth(6); shackle.setTranslateY(-10);
+        Arc shackle = new Arc(0, 0, 10, 10, 180, 180);
+        shackle.setType(ArcType.OPEN); shackle.setFill(Color.TRANSPARENT);
+        shackle.setStroke(Color.web("#AAB7C0")); shackle.setStrokeWidth(6); shackle.setTranslateY(-8);
         Circle keyhole = new Circle(2.3, Color.WHITE); keyhole.setTranslateY(1);
         StackPane icon = new StackPane(new Group(body, shackle, keyhole));
         icon.setPrefSize(38, 38); icon.setMinSize(38, 38); icon.setMaxSize(38, 38);
