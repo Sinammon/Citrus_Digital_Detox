@@ -1,4 +1,3 @@
-import javafx.geometry.Insets;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
@@ -26,7 +25,7 @@ public class SettingsPanel {
         save.setOnAction(event -> economy.setSecondsPerCoin((int) Math.round(rate.getValue())));
         coinCard.getChildren().addAll(title, description, sliderRow, save);
         VBox tutorial = new VBox(8); tutorial.getStyleClass().add("card"); Label tutorialTitle = new Label("How to use Citrus"); tutorialTitle.getStyleClass().add("section-title"); tutorial.getChildren().addAll(tutorialTitle, new TutorialContent().getView());
-        VBox music = new VBox(8); music.getStyleClass().add("card"); Label musicTitle = new Label("Chill background music"); musicTitle.getStyleClass().add("section-title"); Label coming = new Label("Coming soon — a calm focus soundtrack player will live here."); coming.getStyleClass().add("muted"); music.getChildren().addAll(musicTitle, coming);
+        VBox music = new VBox(8); music.getStyleClass().add("card"); music.getChildren().add(new AudioSettings().getView());
         root.getChildren().addAll(coinCard, tutorial, music); return root;
     }
 }

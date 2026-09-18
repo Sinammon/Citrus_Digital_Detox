@@ -60,6 +60,10 @@
 .analytics-value, .slider-value { -fx-min-width: 54px; -fx-alignment: CENTER-RIGHT; }
 .analytics-bar .bar { -fx-background-color: #FDCC21; -fx-background-radius: 10px; }
 .analytics-bar .track { -fx-background-color: #FFF4C2; -fx-background-radius: 10px; }
+.chart-legend-panel { -fx-background-color: #F1F1F1; -fx-background-radius: 10px; }
+.audio-control { -fx-background-color: #FFFDF4; -fx-background-radius: 12px; -fx-padding: 14px; }
+.audio-slider .track { -fx-background-color: #FFF4C2; }
+.audio-slider .thumb { -fx-background-color: #FDCC21; }
 
 .page-frame { -fx-padding: 26px 30px 30px 30px; -fx-spacing: 18px; }
 .content { -fx-padding: 8px 0 0 0; -fx-spacing: 22px; }

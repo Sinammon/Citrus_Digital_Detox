@@ -105,14 +105,19 @@ public class BlockDialog extends Dialog<Block> {
         heading.getStyleClass().add("section-title");
         schedule.getChildren().add(heading);
         for (DayOfWeek day : DayOfWeek.values()) {
-            CheckBox check = dayChecks.computeIfAbsent(day, d -> new CheckBox(shortDay(d)));
-            check.setSelected(true);
+            CheckBox check = dayChecks.get(day);
+            if (check == null) {
+                check = new CheckBox(shortDay(day));
+                check.setSelected(true);
+                dayChecks.put(day, check);
+            }
             Spinner<Integer> start = new Spinner<>(0, 23, 9);
             Spinner<Integer> end = new Spinner<>(0, 23, 17);
             start.setPrefWidth(78); end.setPrefWidth(78);
             dayTimes.put(day, new Spinner[]{start, end});
             HBox row = new HBox(8, check, new Label("from"), start, new Label("to"), end);
             row.setPadding(new Insets(2, 0, 2, 0));
+            row.setDisable(!check.isSelected());
             schedule.getChildren().add(row);
             check.selectedProperty().addListener((obs, oldValue, selected) -> row.setDisable(!selected));
         }

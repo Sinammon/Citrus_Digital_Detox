@@ -28,7 +28,7 @@ public class BlockListPanel {
         this.blockManager = blockManager;
         list.setCellFactory(view -> new BlockCell());
         refresh();
-        Timeline timer = new Timeline(new KeyFrame(Duration.seconds(1), event -> refresh()));
+        Timeline timer = new Timeline(new KeyFrame(Duration.millis(250), event -> refresh()));
         timer.setCycleCount(Timeline.INDEFINITE); timer.play();
     }
 
@@ -60,19 +60,33 @@ public class BlockListPanel {
             String state = bypassed ? "Unlocked block with pass" : locked ? "Locked" : block.isActive() ? "Enabled" : "Disabled";
             Label title = new Label(titleCase(block.getTargetName())); title.getStyleClass().add("section-title");
             Label status = new Label(state + " • " + titleCase(block.getLockType().name().replace('_', ' '))); status.getStyleClass().add("muted");
-            HBox details = new HBox(12, createLockIcon(locked && !bypassed), new VBox(4, title, status)); details.setAlignment(Pos.CENTER_LEFT);
+            Node icon = block.getTargetName().equalsIgnoreCase("instagram") ? createInstagramIcon(locked && !bypassed) : createLockIcon(locked && !bypassed);
+            HBox details = new HBox(12, icon, new VBox(4, title, status)); details.setAlignment(Pos.CENTER_LEFT);
             setGraphic(details);
         }
     }
 
-    private Node createLockIcon(boolean locked) {
-        Color accent = locked ? Color.web("#E0A900") : Color.web("#FDCC21");
-        Rectangle body = new Rectangle(24, 18, accent); body.setArcWidth(5); body.setArcHeight(5);
-        Circle ring = new Circle(9, Color.TRANSPARENT); ring.setStroke(accent); ring.setStrokeWidth(4); ring.setTranslateY(-10);
-        if (!locked) ring.setRotate(-35);
-        Circle keyhole = new Circle(2, Color.WHITE); keyhole.setTranslateY(1);
-        StackPane icon = new StackPane(new Group(body, ring, keyhole)); icon.setPrefSize(34, 34); icon.setMinSize(34, 34); icon.setMaxSize(34, 34); return icon;
+    private Node createInstagramIcon(boolean locked) {
+        if (locked) return createClosedLockIcon(Color.web("#E0A900"));
+        Rectangle camera = new Rectangle(27, 27, Color.TRANSPARENT); camera.setArcWidth(9); camera.setArcHeight(9); camera.setStroke(Color.web("#C13584")); camera.setStrokeWidth(4);
+        Circle lens = new Circle(6, Color.TRANSPARENT); lens.setStroke(Color.web("#C13584")); lens.setStrokeWidth(3);
+        Circle dot = new Circle(2.5, Color.web("#C13584")); dot.setTranslateX(8); dot.setTranslateY(-8);
+        return new StackPane(camera, lens, dot);
     }
 
+    private Node createLockIcon(boolean locked) { return locked ? createClosedLockIcon(Color.web("#E0A900")) : createOpenLockIcon(Color.web("#FDCC21")); }
+    private Node createClosedLockIcon(Color accent) {
+        Rectangle body = new Rectangle(24, 18, accent); body.setArcWidth(5); body.setArcHeight(5);
+        Circle ring = new Circle(9, Color.TRANSPARENT); ring.setStroke(accent); ring.setStrokeWidth(4); ring.setTranslateY(-10);
+        Circle keyhole = new Circle(2, Color.WHITE); keyhole.setTranslateY(1);
+        return iconStack(body, ring, keyhole);
+    }
+    private Node createOpenLockIcon(Color accent) {
+        Rectangle body = new Rectangle(24, 18, accent); body.setArcWidth(5); body.setArcHeight(5);
+        Circle ring = new Circle(9, Color.TRANSPARENT); ring.setStroke(accent); ring.setStrokeWidth(4); ring.setTranslateY(-10); ring.setRotate(-35);
+        Circle keyhole = new Circle(2, Color.WHITE); keyhole.setTranslateY(1);
+        return iconStack(body, ring, keyhole);
+    }
+    private Node iconStack(Node... nodes) { StackPane icon = new StackPane(new Group(nodes)); icon.setPrefSize(34, 34); icon.setMinSize(34, 34); icon.setMaxSize(34, 34); return icon; }
     private String titleCase(String text) { return text == null || text.isBlank() ? "App" : Character.toUpperCase(text.charAt(0)) + text.substring(1).toLowerCase(); }
 }
