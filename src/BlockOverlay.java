@@ -38,6 +38,10 @@ public class BlockOverlay {
             Label error = new Label(); error.getStyleClass().add("overlay-error");
             Button submit = new Button("Continue"); submit.getStyleClass().add("primary-button"); submit.setOnAction(e -> { if (block.validateRandomTextInput(field.getText())) unlock(); else error.setText("Try again — check the word count and duplicates."); });
             root.getChildren().addAll(instruction, field, submit, error);
+        } else if (block.getLockType() == LockType.PASS_BLOCK) {
+            Label shopOnly = new Label("This block can only be unlocked by purchasing a pass from the Shop.");
+            shopOnly.getStyleClass().add("overlay-detail");
+            root.getChildren().add(shopOnly);
         } else if (block.getLockType() == LockType.DELAY) {
             Label wait = new Label("Your break opens in " + block.getDelaySeconds() + " seconds."); root.getChildren().add(wait);
             PauseTransition pause = new PauseTransition(Duration.seconds(block.getDelaySeconds())); pause.setOnFinished(e -> unlock()); pause.play();

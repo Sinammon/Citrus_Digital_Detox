@@ -57,6 +57,11 @@ public class UserEconomy {
     public synchronized void setSecondsPerCoin(int secondsPerCoin) { if (secondsPerCoin > 0) this.secondsPerCoin = secondsPerCoin; }
     public synchronized int getCoins() { return coins; }
     public synchronized double getRemainingSecondsToNextCoin() { return secondsPerCoin - totalProductiveSeconds; }
+    public synchronized void resetDailyMetrics() {
+        totalProductiveSeconds = 0;
+        dailyProductiveSeconds = 0;
+        dailyMetricDate = LocalDate.now();
+    }
 
     private void resetDailyMetricIfNeeded() {
         LocalDate today = LocalDate.now();

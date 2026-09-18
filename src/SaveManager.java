@@ -5,7 +5,7 @@ public class SaveManager {
 
     public static void save(BlockManager blockManager, UserEconomy economy) {
         SaveData data = new SaveData(
-                blockManager.getBlocks(), blockManager.getPasses(), blockManager.getUsageSeconds(),
+                blockManager.getBlocks(), blockManager.getPasses(), blockManager.getUsageSeconds(), blockManager.getTriggerCounts(),
                 economy.getCoins(), economy.getTotalProductiveSecondsRaw(), economy.getDailyProductiveSeconds(),
                 economy.getLifetimeProductiveSeconds(), economy.getSecondsPerCoin());
         try (ObjectOutputStream out = new ObjectOutputStream(new FileOutputStream(FILE_NAME))) {
@@ -21,6 +21,7 @@ public class SaveManager {
             if (data.getBlocks() != null) for (Block block : data.getBlocks()) blockManager.addBlock(block);
             blockManager.setPasses(data.getPasses());
             blockManager.setUsageSeconds(data.getUsageSeconds());
+            blockManager.setTriggerCounts(data.getTriggerCounts());
             economy.setCoins(data.getCoins());
             economy.setTotalProductiveSecondsRaw(data.getTotalProductiveSeconds());
             economy.setDailyProductiveSeconds(data.getDailyProductiveSeconds());

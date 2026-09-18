@@ -61,7 +61,7 @@ public class WindowMonitor {
                 overlayCreationPending = true;
             }
 
-            match.incrementTriggerCount();
+            blockManager.recordTrigger(match);
             Platform.runLater(() -> {
                 synchronized (overlayLock) {
                     if (!overlayCreationPending) return;

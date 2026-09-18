@@ -4,5 +4,6 @@ public enum LockType {
     RANDOM_TEXT,
     DELAY,
     BEDTIME,
-    EMERGENCY
+    EMERGENCY,
+    PASS_BLOCK
 }

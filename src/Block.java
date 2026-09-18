@@ -78,7 +78,7 @@ public class Block implements Serializable {
                 return isWithinSchedule(dateTimeNow);
             case BEDTIME:
                 return isWithinRange(dateTimeNow.toLocalTime(), bedStart, bedEnd);
-            case RANDOM_TEXT, DELAY, EMERGENCY:
+            case RANDOM_TEXT, DELAY, EMERGENCY, PASS_BLOCK:
                 return true;
             default:
                 return false;

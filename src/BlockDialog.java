@@ -8,6 +8,7 @@ import javafx.scene.control.Dialog;
 import javafx.scene.control.Label;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.Slider;
+import javafx.scene.control.Spinner;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
@@ -30,7 +31,7 @@ public class BlockDialog extends Dialog<Block> {
     private final Slider challenge = slider(5, 200, 20, 5);
     private final Slider delay = slider(5, 600, 30, 5);
     private final Map<DayOfWeek, CheckBox> dayChecks = new EnumMap<>(DayOfWeek.class);
-    private final Map<DayOfWeek, Slider[]> dayTimes = new EnumMap<>(DayOfWeek.class);
+    private final Map<DayOfWeek, Spinner<Integer>[]> dayTimes = new EnumMap<>(DayOfWeek.class);
     private final PasswordField password = new PasswordField();
 
     public BlockDialog(BlockManager blockManager) {
@@ -94,6 +95,7 @@ public class BlockDialog extends Dialog<Block> {
             case RANDOM_TEXT -> options.getChildren().add(sliderRow("Different words", challenge, " words"));
             case DELAY -> options.getChildren().add(sliderRow("Delay", delay, " sec"));
             case EMERGENCY -> options.getChildren().add(new HBox(14, new Label("Emergency password"), password));
+            case PASS_BLOCK -> options.getChildren().add(new Label("This block can only be unlocked by purchasing a pass from the Shop."));
         }
     }
 
@@ -105,10 +107,11 @@ public class BlockDialog extends Dialog<Block> {
         for (DayOfWeek day : DayOfWeek.values()) {
             CheckBox check = dayChecks.computeIfAbsent(day, d -> new CheckBox(shortDay(d)));
             check.setSelected(true);
-            Slider start = slider(0, 23, 9, 1);
-            Slider end = slider(0, 23, 17, 1);
-            dayTimes.put(day, new Slider[]{start, end});
-            HBox row = new HBox(8, check, sliderRow("from", start, ":00"), sliderRow("to", end, ":00"));
+            Spinner<Integer> start = new Spinner<>(0, 23, 9);
+            Spinner<Integer> end = new Spinner<>(0, 23, 17);
+            start.setPrefWidth(78); end.setPrefWidth(78);
+            dayTimes.put(day, new Spinner[]{start, end});
+            HBox row = new HBox(8, check, new Label("from"), start, new Label("to"), end);
             row.setPadding(new Insets(2, 0, 2, 0));
             schedule.getChildren().add(row);
             check.selectedProperty().addListener((obs, oldValue, selected) -> row.setDisable(!selected));
@@ -127,8 +130,8 @@ public class BlockDialog extends Dialog<Block> {
                 EnumSet<DayOfWeek> selectedDays = EnumSet.noneOf(DayOfWeek.class);
                 for (DayOfWeek day : DayOfWeek.values()) {
                     if (!dayChecks.get(day).isSelected()) continue;
-                    int start = (int) Math.round(dayTimes.get(day)[0].getValue());
-                    int end = (int) Math.round(dayTimes.get(day)[1].getValue());
+                    int start = dayTimes.get(day)[0].getValue();
+                    int end = dayTimes.get(day)[1].getValue();
                     if (start == end) { warning("Start and end hours must be different for " + shortDay(day) + "."); return null; }
                     selectedDays.add(day);
                     schedule.put(day, new Block.DaySchedule(LocalTime.of(start, 0), LocalTime.of(end, 0)));
@@ -155,6 +158,7 @@ public class BlockDialog extends Dialog<Block> {
             case DELAY -> "Adds a waiting period before the app can be opened.";
             case BEDTIME -> "Blocks the app during your chosen sleep hours.";
             case EMERGENCY -> "Requires your emergency password to bypass the block.";
+            case PASS_BLOCK -> "This block can only be unlocked by purchasing a pass from the Shop.";
         };
     }
 

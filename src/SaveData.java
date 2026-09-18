@@ -7,6 +7,7 @@ public class SaveData implements Serializable {
     private List<Block> blocks;
     private List<Pass> passes;
     private Map<String, Long> usageSeconds;
+    private Map<String, Integer> triggerCounts;
     private int coins;
     private double totalProductiveSeconds;
     private double dailyProductiveSeconds;
@@ -14,12 +15,13 @@ public class SaveData implements Serializable {
     private boolean hasLifetimeProductiveSeconds;
     private int secondsPerCoin;
 
-    public SaveData(List<Block> blocks, List<Pass> passes, Map<String, Long> usageSeconds, int coins,
+    public SaveData(List<Block> blocks, List<Pass> passes, Map<String, Long> usageSeconds, Map<String, Integer> triggerCounts, int coins,
                     double totalProductiveSeconds, double dailyProductiveSeconds,
                     double lifetimeProductiveSeconds, int secondsPerCoin) {
         this.blocks = blocks;
         this.passes = passes;
         this.usageSeconds = usageSeconds;
+        this.triggerCounts = triggerCounts;
         this.coins = coins;
         this.totalProductiveSeconds = totalProductiveSeconds;
         this.dailyProductiveSeconds = dailyProductiveSeconds;
@@ -31,6 +33,7 @@ public class SaveData implements Serializable {
     public List<Block> getBlocks() { return blocks; }
     public List<Pass> getPasses() { return passes; }
     public Map<String, Long> getUsageSeconds() { return usageSeconds; }
+    public Map<String, Integer> getTriggerCounts() { return triggerCounts; }
     public int getCoins() { return coins; }
     public double getTotalProductiveSeconds() { return totalProductiveSeconds; }
     public double getDailyProductiveSeconds() { return dailyProductiveSeconds; }

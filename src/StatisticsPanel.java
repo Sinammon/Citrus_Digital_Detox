@@ -8,7 +8,6 @@ import javafx.scene.control.Label;
 import javafx.scene.control.ProgressBar;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
-import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
@@ -28,7 +27,7 @@ public class StatisticsPanel {
         VBox root = new VBox(18); root.getStyleClass().add("content");
         Label goal = new Label("Daily focus goal"); goal.getStyleClass().add("section-title"); progress.setMaxWidth(Double.MAX_VALUE);
         Label hint = new Label("Progress toward 2 hours of productive time"); hint.getStyleClass().add("muted");
-        chart.setTitle("Lock activity proportions"); chart.setLegendVisible(false); chart.setLabelsVisible(false); chart.setAnimated(false); VBox.setVgrow(chart, Priority.ALWAYS);
+        chart.setTitle("Lock Activity : Blocks Triggered"); chart.setLegendVisible(false); chart.setLabelsVisible(false); chart.setAnimated(false); VBox.setVgrow(chart, Priority.ALWAYS);
         legend.getStyleClass().add("chart-legend");
         HBox visualization = new HBox(24, chart, legend); visualization.setAlignment(Pos.CENTER); HBox.setHgrow(chart, Priority.ALWAYS); VBox.setVgrow(visualization, Priority.ALWAYS);
         root.getChildren().addAll(goal, progress, hint, visualization); refresh();
@@ -37,15 +36,16 @@ public class StatisticsPanel {
 
     private void refresh() {
         progress.setProgress(Math.min(economy.getTotalProductiveMinutes() / 120.0, 1));
-        var data = FXCollections.observableArrayList(blockManager.getBlocks().stream().filter(block -> block.getTimesTriggered() > 0).map(block -> new PieChart.Data(block.getTargetName(), block.getTimesTriggered())).toList());
-        chart.setData(data); legend.getChildren().clear();
+        var counts = blockManager.getTriggerCounts();
+        var data = FXCollections.observableArrayList(counts.entrySet().stream().filter(entry -> entry.getValue() > 0).map(entry -> new PieChart.Data(entry.getKey(), entry.getValue())).toList());
+        chart.setData(data); chart.setLabelsVisible(false); legend.getChildren().clear();
+        if (data.isEmpty()) { Label empty = new Label("No blocks triggered."); empty.getStyleClass().add("muted"); legend.getChildren().add(empty); return; }
         for (int i = 0; i < data.size(); i++) {
-            PieChart.Data slice = data.get(i); slice.getNode().setStyle("-fx-pie-color: " + toHex(colors[i % colors.length]) + ";");
+            PieChart.Data slice = data.get(i);
             Rectangle swatch = new Rectangle(12, 12, colors[i % colors.length]);
-            Label label = new Label(titleCase(slice.getName())); label.getStyleClass().add("muted");
+            Label label = new Label(titleCase(slice.getName()) + " (Triggered: " + (int) slice.getPieValue() + ")"); label.getStyleClass().add("muted");
             HBox row = new HBox(8, swatch, label); row.setAlignment(Pos.CENTER_LEFT); legend.getChildren().add(row);
         }
     }
-    private String toHex(Color color) { return String.format("#%02X%02X%02X", (int)(color.getRed()*255), (int)(color.getGreen()*255), (int)(color.getBlue()*255)); }
     private String titleCase(String value) { return value == null || value.isBlank() ? "App" : Character.toUpperCase(value.charAt(0)) + value.substring(1).toLowerCase(); }
 }
