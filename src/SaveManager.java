@@ -8,6 +8,7 @@ public class SaveManager {
                 blockManager.getBlocks(),
                 economy.getCoins(),
                 economy.getTotalProductiveSecondsRaw(),
+                economy.getDailyProductiveSeconds(),
                 economy.getLifetimeProductiveSeconds(),
                 economy.getSecondsPerCoin());
         try (ObjectOutputStream out = new ObjectOutputStream(new FileOutputStream(FILE_NAME))) {
@@ -28,6 +29,7 @@ public class SaveManager {
             }
             economy.setCoins(data.getCoins());
             economy.setTotalProductiveSecondsRaw(data.getTotalProductiveSeconds());
+            economy.setDailyProductiveSeconds(data.getDailyProductiveSeconds());
             economy.setSecondsPerCoin(data.getSecondsPerCoin());
             if (data.hasLifetimeProductiveSeconds()) {
                 economy.setLifetimeProductiveSeconds(data.getLifetimeProductiveSeconds());

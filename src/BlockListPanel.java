@@ -1,6 +1,7 @@
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
@@ -9,13 +10,13 @@ import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
-import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 import javafx.util.Duration;
 
 public class BlockListPanel {
     private final BlockManager blockManager;
-    private final ListView<Block> list = new ListView<>();
+    private final ObservableList<Block> blocks = FXCollections.observableArrayList();
+    private final ListView<Block> list = new ListView<>(blocks);
 
     public BlockListPanel(BlockManager blockManager) {
         this.blockManager = blockManager;
@@ -55,8 +56,9 @@ public class BlockListPanel {
 
     private void refresh() {
         Block selected = list.getSelectionModel().getSelectedItem();
-        list.setItems(FXCollections.observableArrayList(blockManager.getBlocks()));
+        blocks.setAll(blockManager.getBlocks());
         if (selected != null) list.getSelectionModel().select(selected);
+        list.refresh();
     }
 
     private static class BlockCell extends ListCell<Block> {

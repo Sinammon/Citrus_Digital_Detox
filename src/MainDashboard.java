@@ -8,7 +8,6 @@ import javafx.scene.control.Label;
 import javafx.scene.control.ToggleButton;
 import javafx.scene.control.ToggleGroup;
 import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.StackPane;
@@ -17,7 +16,6 @@ import javafx.scene.paint.Color;
 import javafx.scene.shape.Arc;
 import javafx.scene.shape.ArcType;
 import javafx.scene.shape.Circle;
-import javafx.scene.shape.Line;
 import javafx.scene.shape.Polygon;
 import javafx.util.Duration;
 
@@ -100,11 +98,10 @@ public class MainDashboard {
     }
 
     private HBox createCoinDisplay() {
-        HBox display = new HBox(9, createCoinIcon(22), coinLabel, new Label("coins"));
+        HBox display = new HBox(9, createCoinIcon(22), coinLabel);
         display.setAlignment(Pos.CENTER);
         display.getStyleClass().add("coin-chip");
         coinLabel.getStyleClass().add("coin-value");
-        display.getChildren().get(2).getStyleClass().add("coin-caption");
         return display;
     }
 
@@ -157,15 +154,13 @@ public class MainDashboard {
     private Node createDashboard() {
         VBox view = new VBox(22);
         view.getStyleClass().add("content");
-        Label welcome = new Label("Your focus space");
-        welcome.getStyleClass().add("section-title");
         Label subtitle = new Label("Set boundaries for distracting apps, then earn coins while you stay focused.");
-        subtitle.getStyleClass().add("muted");
+        subtitle.getStyleClass().add("hero-title");
         HBox metrics = new HBox(18);
         metrics.getChildren().addAll(metricCard("Productive time", "time"), metricCard("Blocks active now", "blocks"),
                 staticCard("Daily goal", "2h 0m", "A gentle target for today"));
         TutorialContent tutorial = new TutorialContent();
-        view.getChildren().addAll(welcome, subtitle, metrics, tutorial.getView());
+        view.getChildren().addAll(subtitle, metrics, tutorial.getView());
         Timeline refresh = new Timeline(new KeyFrame(Duration.seconds(1), event -> {
             int minutes = (int) economy.getTotalProductiveMinutes();
             ((Label) metrics.lookup("#time")).setText((minutes / 60) + "h " + (minutes % 60) + "m");
