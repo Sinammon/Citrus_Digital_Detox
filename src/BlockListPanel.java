@@ -10,7 +10,7 @@ import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
-import javafx.scene.layout.StackPane;
+import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
@@ -94,17 +94,19 @@ public class BlockListPanel {
         }
     }
 
-    /** Static standard padlock: gray U-shaped shackle, orange rounded body, and white keyhole. */
+    /** Static standard padlock drawn on a fixed canvas: gray inverted-U over orange body. */
     private Node createStaticLockIcon() {
-        Rectangle body = new Rectangle(27, 21, Color.web("#FFAD32"));
+        Rectangle body = new Rectangle(5, 15, 28, 20);
+        body.setFill(Color.web("#FFAD32"));
         body.setArcWidth(7);
         body.setArcHeight(7);
         SVGPath shackle = new SVGPath();
-        shackle.setContent("M 8 15 L 8 9 A 9 9 0 0 1 26 9 L 26 15 L 21 15 L 21 9 A 4 4 0 0 0 13 9 L 13 15 Z");
+        shackle.setContent("M 8 16 L 8 10 A 11 11 0 0 1 30 10 L 30 16 L 25 16 L 25 10 A 6 6 0 0 0 13 10 L 13 16 Z");
         shackle.setFill(Color.web("#AAB7C0"));
         Circle keyhole = new Circle(2.3, Color.WHITE);
-        keyhole.setTranslateY(1);
-        StackPane icon = new StackPane(body, shackle, keyhole);
+        keyhole.setCenterX(19);
+        keyhole.setCenterY(25);
+        Pane icon = new Pane(body, shackle, keyhole);
         icon.setPrefSize(38, 38);
         icon.setMinSize(38, 38);
         icon.setMaxSize(38, 38);
