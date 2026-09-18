@@ -27,6 +27,7 @@ public class MainDashboard {
     private final Label pageTitle = new Label("Dashboard");
     private final Label coinLabel = new Label();
     private final ToggleGroup navigation = new ToggleGroup();
+    private final AudioSettings audioSettings = new AudioSettings();
 
     public MainDashboard(BlockManager blockManager, UserEconomy economy) {
         this.blockManager = blockManager;
@@ -43,6 +44,7 @@ public class MainDashboard {
     }
 
     public BorderPane getView() { return root; }
+    public void stopAudio() { audioSettings.stop(); }
 
     private VBox createSidebar() {
         VBox sidebar = new VBox();
@@ -61,7 +63,7 @@ public class MainDashboard {
         ToggleButton blocks = navButton("◫  My Blocks", false, () -> showPage("My Blocks", new BlockListPanel(blockManager).getView()));
         ToggleButton shop = navButton("◈  Shop", false, () -> showPage("Shop", new ShopPanel(blockManager, economy).getView()));
         ToggleButton statistics = navButton("↗  Statistics", false, () -> showPage("Statistics", new StatisticsPanel(blockManager, economy).getView()));
-        ToggleButton settings = navButton("⚙  Settings", false, () -> showPage("Settings", new SettingsPanel(economy).getView()));
+        ToggleButton settings = navButton("⚙  Settings", false, () -> showPage("Settings", new SettingsPanel(economy, audioSettings).getView()));
 
         sidebar.getChildren().addAll(brandRow, tagline, dashboard, blocks, shop, statistics);
         VBox spacer = new VBox();

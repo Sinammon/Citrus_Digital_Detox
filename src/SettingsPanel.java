@@ -7,7 +7,8 @@ import javafx.scene.layout.VBox;
 
 public class SettingsPanel {
     private final UserEconomy economy;
-    public SettingsPanel(UserEconomy economy) { this.economy = economy; }
+    private final AudioSettings audioSettings;
+    public SettingsPanel(UserEconomy economy, AudioSettings audioSettings) { this.economy = economy; this.audioSettings = audioSettings; }
 
     public Node getView() {
         VBox root = new VBox(20); root.getStyleClass().add("content");
@@ -25,7 +26,7 @@ public class SettingsPanel {
         save.setOnAction(event -> economy.setSecondsPerCoin((int) Math.round(rate.getValue())));
         coinCard.getChildren().addAll(title, description, sliderRow, save);
         VBox tutorial = new VBox(8); tutorial.getStyleClass().add("card"); Label tutorialTitle = new Label("How to use Citrus"); tutorialTitle.getStyleClass().add("section-title"); tutorial.getChildren().addAll(tutorialTitle, new TutorialContent().getView());
-        VBox music = new VBox(8); music.getStyleClass().add("card"); music.getChildren().add(new AudioSettings().getView());
+        VBox music = new VBox(8); music.getStyleClass().add("card"); music.getChildren().add(audioSettings.getView());
         root.getChildren().addAll(coinCard, tutorial, music); return root;
     }
 }

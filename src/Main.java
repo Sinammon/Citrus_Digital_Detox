@@ -13,13 +13,14 @@ public class Main extends Application {
     private final UserEconomy economy = new UserEconomy();
     private WindowMonitor monitor;
     private ScheduledExecutorService dailyReset;
+    private MainDashboard dashboard;
 
     public static void main(String[] args) { launch(args); }
 
     @Override
     public void start(Stage stage) {
         SaveManager.load(blockManager, economy);
-        MainDashboard dashboard = new MainDashboard(blockManager, economy);
+        dashboard = new MainDashboard(blockManager, economy);
         Scene scene = new Scene(dashboard.getView(), 1100, 720);
         scene.getStylesheets().add(getClass().getResource("/citrus.css").toExternalForm());
         stage.setTitle("Citrus — Digital Detox"); stage.setMinWidth(900); stage.setMinHeight(620); stage.setScene(scene); stage.show();
@@ -43,6 +44,7 @@ public class Main extends Application {
     public void stop() {
         if (monitor != null) monitor.stopMonitoring();
         if (dailyReset != null) dailyReset.shutdownNow();
+        if (dashboard != null) dashboard.stopAudio();
         SaveManager.save(blockManager, economy);
     }
 }
