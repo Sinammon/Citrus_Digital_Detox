@@ -38,6 +38,7 @@ public class WindowMonitor {
                 long now = System.currentTimeMillis();
                 double elapsedSeconds = (now - lastTickTime) / 1000.0;
                 lastTickTime = now;
+                blockManager.recordUsageForWindow(title, elapsedSeconds);
 
                 if (match == null && getIdleSeconds() < 60) {
                     economy.addProductiveTime(elapsedSeconds);

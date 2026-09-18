@@ -160,7 +160,7 @@ public class MainDashboard {
         metrics.getChildren().addAll(metricCard("Productive time", "time"), metricCard("Blocks active now", "blocks"),
                 staticCard("Daily goal", "2h 0m", "A gentle target for today"));
         TutorialContent tutorial = new TutorialContent();
-        TopAppsAnalytics analytics = new TopAppsAnalytics(economy);
+        TopAppsAnalytics analytics = new TopAppsAnalytics(blockManager);
         view.getChildren().addAll(subtitle, metrics, tutorial.getView(), analytics.getView());
         Timeline refresh = new Timeline(new KeyFrame(Duration.seconds(1), event -> {
             int minutes = (int) economy.getTotalProductiveMinutes();

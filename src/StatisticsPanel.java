@@ -1,11 +1,17 @@
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.collections.FXCollections;
+import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.chart.PieChart;
 import javafx.scene.control.Label;
 import javafx.scene.control.ProgressBar;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.Priority;
+import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
+import javafx.scene.paint.Color;
+import javafx.scene.shape.Rectangle;
 import javafx.util.Duration;
 
 public class StatisticsPanel {
@@ -13,35 +19,33 @@ public class StatisticsPanel {
     private final UserEconomy economy;
     private final ProgressBar progress = new ProgressBar();
     private final PieChart chart = new PieChart();
+    private final VBox legend = new VBox(10);
+    private final Color[] colors = {Color.web("#FDCC21"), Color.web("#E0A900"), Color.web("#FFE578"), Color.web("#F2BE09"), Color.web("#B98200")};
 
-    public StatisticsPanel(BlockManager blockManager, UserEconomy economy) {
-        this.blockManager = blockManager;
-        this.economy = economy;
-    }
+    public StatisticsPanel(BlockManager blockManager, UserEconomy economy) { this.blockManager = blockManager; this.economy = economy; }
 
     public Node getView() {
-        VBox root = new VBox(18);
-        root.getStyleClass().add("content");
-        Label goal = new Label("Daily focus goal"); goal.getStyleClass().add("section-title");
-        progress.setMaxWidth(Double.MAX_VALUE);
+        VBox root = new VBox(18); root.getStyleClass().add("content");
+        Label goal = new Label("Daily focus goal"); goal.getStyleClass().add("section-title"); progress.setMaxWidth(Double.MAX_VALUE);
         Label hint = new Label("Progress toward 2 hours of productive time"); hint.getStyleClass().add("muted");
-        chart.setTitle("Lock activity proportions");
-        chart.setLegendVisible(true);
-        chart.setLabelsVisible(true);
-        chart.setAnimated(false);
-        VBox.setVgrow(chart, javafx.scene.layout.Priority.ALWAYS);
-        root.getChildren().addAll(goal, progress, hint, chart);
-        refresh();
-        Timeline refresh = new Timeline(new KeyFrame(Duration.seconds(1), e -> refresh()));
-        refresh.setCycleCount(Timeline.INDEFINITE); refresh.play();
-        return root;
+        chart.setTitle("Lock activity proportions"); chart.setLegendVisible(false); chart.setLabelsVisible(false); chart.setAnimated(false); VBox.setVgrow(chart, Priority.ALWAYS);
+        legend.getStyleClass().add("chart-legend");
+        HBox visualization = new HBox(24, chart, legend); visualization.setAlignment(Pos.CENTER); HBox.setHgrow(chart, Priority.ALWAYS); VBox.setVgrow(visualization, Priority.ALWAYS);
+        root.getChildren().addAll(goal, progress, hint, visualization); refresh();
+        Timeline refresh = new Timeline(new KeyFrame(Duration.seconds(1), e -> refresh())); refresh.setCycleCount(Timeline.INDEFINITE); refresh.play(); return root;
     }
 
     private void refresh() {
         progress.setProgress(Math.min(economy.getTotalProductiveMinutes() / 120.0, 1));
-        chart.setData(FXCollections.observableArrayList(blockManager.getBlocks().stream()
-                .filter(block -> block.getTimesTriggered() > 0)
-                .map(block -> new PieChart.Data(block.getTargetName(), block.getTimesTriggered()))
-                .toList()));
+        var data = FXCollections.observableArrayList(blockManager.getBlocks().stream().filter(block -> block.getTimesTriggered() > 0).map(block -> new PieChart.Data(block.getTargetName(), block.getTimesTriggered())).toList());
+        chart.setData(data); legend.getChildren().clear();
+        for (int i = 0; i < data.size(); i++) {
+            PieChart.Data slice = data.get(i); slice.getNode().setStyle("-fx-pie-color: " + toHex(colors[i % colors.length]) + ";");
+            Rectangle swatch = new Rectangle(12, 12, colors[i % colors.length]);
+            Label label = new Label(titleCase(slice.getName())); label.getStyleClass().add("muted");
+            HBox row = new HBox(8, swatch, label); row.setAlignment(Pos.CENTER_LEFT); legend.getChildren().add(row);
+        }
     }
+    private String toHex(Color color) { return String.format("#%02X%02X%02X", (int)(color.getRed()*255), (int)(color.getGreen()*255), (int)(color.getBlue()*255)); }
+    private String titleCase(String value) { return value == null || value.isBlank() ? "App" : Character.toUpperCase(value.charAt(0)) + value.substring(1).toLowerCase(); }
 }

@@ -1,57 +1,62 @@
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 public class BlockManager {
     private final List<Block> blocks = new CopyOnWriteArrayList<>();
     private final List<Pass> passes = new CopyOnWriteArrayList<>();
+    private final Map<String, Long> usageSeconds = new LinkedHashMap<>();
 
-    public void addPass(Pass pass) {
-        passes.add(pass);
+    public void addPass(Pass pass) { passes.add(pass); }
+    public List<Pass> getPasses() { return passes; }
+    public void setPasses(List<Pass> savedPasses) { passes.clear(); if (savedPasses != null) passes.addAll(savedPasses); }
+    public List<Pass> getCustomPasses() { return passes.stream().filter(Pass::isCustom).toList(); }
+
+    public synchronized void recordUsage(String targetName, double seconds) {
+        if (targetName == null || targetName.isBlank() || seconds <= 0) return;
+        usageSeconds.merge(targetName, Math.round(seconds), Long::sum);
     }
-    private boolean hasActivePass(String targetName) {
-        passes.removeIf(pass -> !pass.isActive());
-        for (Pass p : passes) {
-            if (p.isActive() && p.getTargetName().equalsIgnoreCase(targetName)) {
-                return true;
+    public synchronized Map<String, Long> getUsageSeconds() { return new LinkedHashMap<>(usageSeconds); }
+    public synchronized void setUsageSeconds(Map<String, Long> savedUsage) {
+        usageSeconds.clear(); if (savedUsage != null) usageSeconds.putAll(savedUsage);
+    }
+    public void recordUsageForWindow(String activeWindowTitle, double seconds) {
+        if (activeWindowTitle == null || activeWindowTitle.isBlank()) return;
+        String lower = activeWindowTitle.toLowerCase();
+        for (Block block : blocks) {
+            if (lower.contains(block.getTargetName().toLowerCase())) {
+                recordUsage(block.getTargetName(), seconds);
+                return;
             }
         }
-        return false;
-    }
-    public void addBlock(Block block) {
-        blocks.add(block);
     }
 
-    public void removeBlock(Block block) {
-        blocks.remove(block);
+    private boolean hasActivePass(String targetName) {
+        passes.removeIf(pass -> pass.isPurchased() && !pass.isActive());
+        return passes.stream().anyMatch(pass -> pass.isActive() && pass.getTargetName().equalsIgnoreCase(targetName));
     }
-
-    public List<Block> getBlocks() {
-        return blocks;
-    }
+    public void addBlock(Block block) { blocks.add(block); }
+    public void removeBlock(Block block) { blocks.remove(block); }
+    public List<Block> getBlocks() { return blocks; }
 
     public int countActiveBlocks() {
         int count = 0;
-        for (Block b : blocks) {
-            if (b.isCurrentlyBlocking()) count++;
-        }
+        for (Block block : blocks) if (block.isCurrentlyBlocking()) count++;
         return count;
     }
-    /**
-     * Given the active window's title (e.g. "YouTube - Google Chrome"),
-     * return the matching Block if one should trigger an overlay, else null.
-     */
+
+    public boolean isBypassedWithPass(Block block) {
+        if (block == null) return false;
+        return passes.stream().anyMatch(pass -> pass.isActive() && pass.getTargetName().equalsIgnoreCase(block.getTargetName()));
+    }
+
     public Block findMatchingBlock(String activeWindowTitle) {
         if (activeWindowTitle == null || activeWindowTitle.isBlank()) return null;
         String lower = activeWindowTitle.toLowerCase();
-
-        for (Block b : blocks) {
-            if (b.isCurrentlyBlocking()
-                    && lower.contains(b.getTargetName().toLowerCase())
-                    && !hasActivePass(b.getTargetName())) {
-                return b;
-            }
+        for (Block block : blocks) {
+            if (block.isCurrentlyBlocking() && lower.contains(block.getTargetName().toLowerCase()) && !hasActivePass(block.getTargetName())) return block;
         }
         return null;
     }
-
 }

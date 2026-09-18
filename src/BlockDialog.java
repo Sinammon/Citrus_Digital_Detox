@@ -103,7 +103,7 @@ public class BlockDialog extends Dialog<Block> {
         heading.getStyleClass().add("section-title");
         schedule.getChildren().add(heading);
         for (DayOfWeek day : DayOfWeek.values()) {
-            CheckBox check = dayChecks.computeIfAbsent(day, d -> new CheckBox(titleCase(d.name())));
+            CheckBox check = dayChecks.computeIfAbsent(day, d -> new CheckBox(shortDay(d)));
             check.setSelected(true);
             Slider start = slider(0, 23, 9, 1);
             Slider end = slider(0, 23, 17, 1);
@@ -129,7 +129,7 @@ public class BlockDialog extends Dialog<Block> {
                     if (!dayChecks.get(day).isSelected()) continue;
                     int start = (int) Math.round(dayTimes.get(day)[0].getValue());
                     int end = (int) Math.round(dayTimes.get(day)[1].getValue());
-                    if (start == end) { warning("Start and end hours must be different for " + titleCase(day.name()) + "."); return null; }
+                    if (start == end) { warning("Start and end hours must be different for " + shortDay(day) + "."); return null; }
                     selectedDays.add(day);
                     schedule.put(day, new Block.DaySchedule(LocalTime.of(start, 0), LocalTime.of(end, 0)));
                 }
@@ -163,6 +163,13 @@ public class BlockDialog extends Dialog<Block> {
         StringBuilder result = new StringBuilder();
         for (String word : words) if (!word.isBlank()) result.append(Character.toUpperCase(word.charAt(0))).append(word.substring(1)).append(' ');
         return result.toString().trim();
+    }
+
+    private String shortDay(DayOfWeek day) {
+        return switch (day) {
+            case MONDAY -> "Mon"; case TUESDAY -> "Tue"; case WEDNESDAY -> "Wed";
+            case THURSDAY -> "Thu"; case FRIDAY -> "Fri"; case SATURDAY -> "Sat"; case SUNDAY -> "Sun";
+        };
     }
 
     private void warning(String message) { new Alert(Alert.AlertType.WARNING, message, ButtonType.OK).showAndWait(); }
