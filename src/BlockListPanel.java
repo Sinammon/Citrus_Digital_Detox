@@ -18,10 +18,14 @@ import javafx.scene.shape.Rectangle;
 import javafx.scene.shape.SVGPath;
 import javafx.util.Duration;
 
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
+
 public class BlockListPanel {
     private final BlockManager blockManager;
     private final ObservableList<Block> blocks = FXCollections.observableArrayList();
     private final ListView<Block> list = new ListView<>(blocks);
+    private final Set<BlockCell> cells = ConcurrentHashMap.newKeySet();
 
     public BlockListPanel(BlockManager blockManager) {
         this.blockManager = blockManager;
@@ -71,19 +75,35 @@ public class BlockListPanel {
 
     /** Refreshes cell content in place; it never clears or rebuilds the list model. */
     private void refreshVisibleCells() {
-        list.refresh();
+        cells.forEach(BlockCell::refreshIfNeeded);
     }
 
     private class BlockCell extends ListCell<Block> {
+        private Block renderedBlock;
+        private String renderedState;
+
         @Override protected void updateItem(Block block, boolean empty) {
             super.updateItem(block, empty);
             if (empty || block == null) {
+                renderedBlock = null;
+                renderedState = null;
                 setGraphic(null);
                 return;
             }
+            cells.add(this);
+            renderedBlock = block;
+            renderedState = null;
+            refreshIfNeeded();
+        }
+
+        private void refreshIfNeeded() {
+            Block block = renderedBlock;
+            if (block == null) return;
             boolean locked = block.isCurrentlyBlocking();
             boolean bypassed = blockManager.isBypassedWithPass(block);
             String state = bypassed ? "Unlocked block with pass" : locked ? "Locked" : block.isTimerExpired() ? "Disabled" : block.isActive() ? "Enabled" : "Disabled";
+            if (state.equals(renderedState)) return;
+            renderedState = state;
             Label title = new Label(titleCase(block.getTargetName()));
             title.getStyleClass().add("section-title");
             Label status = new Label(state + " • " + titleCase(block.getLockType().name().replace('_', ' ')));

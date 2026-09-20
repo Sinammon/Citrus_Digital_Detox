@@ -41,7 +41,8 @@ public class ShopPanel {
         String service = pass.getDisplayName().replace(" Pass", "");
         HBox heading = new HBox(10, createAppIcon(service), new Label(pass.getDisplayName())); heading.setAlignment(Pos.CENTER_LEFT); heading.getChildren().get(1).getStyleClass().add("section-title");
         Label detail = new Label(pass.getDescription()); detail.getStyleClass().add("muted"); detail.setWrapText(true);
-        Button buy = new Button("Buy for 5 coins"); buy.getStyleClass().add("primary-button"); buy.setOnAction(event -> purchase(pass));
+        Button buy = new Button("5"); buy.setGraphic(createCoinIcon(16)); buy.setContentDisplay(javafx.scene.control.ContentDisplay.RIGHT);
+        buy.setGraphicTextGap(5); buy.setTooltip(new javafx.scene.control.Tooltip("Spend 5 coins")); buy.getStyleClass().add("primary-button"); buy.setOnAction(event -> purchase(pass));
         if (pass.isCustom()) {
             Button delete = new Button("Delete"); delete.getStyleClass().add("secondary-button");
             delete.setOnAction(event -> { if (blockManager.removeCustomPass(pass)) passes.getChildren().remove(card); });
@@ -73,6 +74,20 @@ public class ShopPanel {
         Color color = switch (app) { case "Youtube" -> Color.web("#FF3D3D"); case "Netflix" -> Color.web("#D81F32"); case "Spotify" -> Color.web("#1DB954"); case "WhatsApp" -> Color.web("#25D366"); case "Instagram" -> Color.web("#C13584"); case "Discord" -> Color.web("#5865F2"); default -> Color.WHITE; };
         Circle background = new Circle(18, color); Circle inner = new Circle(11, Color.TRANSPARENT); inner.setStroke(Color.WHITE); inner.setStrokeWidth(2); Polygon mark = new Polygon(-5, -3, 0, -7, 6, -3, 4, 5, 0, 8, -4, 5); mark.setFill(Color.WHITE);
         StackPane icon = new StackPane(new Group(background, inner, mark)); icon.setPrefSize(36, 36); icon.setMinSize(36, 36); icon.setMaxSize(36, 36); return icon;
+    }
+    private Node createCoinIcon(double size) {
+        double radius = size / 2;
+        Circle coin = new Circle(radius, Color.web("#FDCC21"));
+        coin.setStroke(Color.web("#B98200")); coin.setStrokeWidth(1.2);
+        Circle innerRing = new Circle(radius * 0.68, Color.TRANSPARENT);
+        innerRing.setStroke(Color.web("#FFF8D9")); innerRing.setStrokeWidth(1.2);
+        Polygon sparkle = new Polygon(0, -radius * 0.38, radius * 0.1, -radius * 0.1,
+                radius * 0.38, 0, radius * 0.1, radius * 0.1, 0, radius * 0.38,
+                -radius * 0.1, radius * 0.1, -radius * 0.38, 0, -radius * 0.1, -radius * 0.1);
+        sparkle.setFill(Color.web("#FFF8D9"));
+        StackPane icon = new StackPane(coin, innerRing, sparkle);
+        icon.setPrefSize(size, size); icon.setMinSize(size, size); icon.setMaxSize(size, size);
+        return icon;
     }
     private void message(String title, String content) { Alert alert = new Alert(Alert.AlertType.INFORMATION, content); alert.setTitle(title); alert.setHeaderText(null); alert.showAndWait(); }
 }
