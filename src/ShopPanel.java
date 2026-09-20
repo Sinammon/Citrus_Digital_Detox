@@ -41,8 +41,8 @@ public class ShopPanel {
         String service = pass.getDisplayName().replace(" Pass", "");
         HBox heading = new HBox(10, createAppIcon(service), new Label(pass.getDisplayName())); heading.setAlignment(Pos.CENTER_LEFT); heading.getChildren().get(1).getStyleClass().add("section-title");
         Label detail = new Label(pass.getDescription()); detail.getStyleClass().add("muted"); detail.setWrapText(true);
-        Button buy = new Button("5"); buy.setGraphic(createCoinIcon(16)); buy.setContentDisplay(javafx.scene.control.ContentDisplay.RIGHT);
-        buy.setGraphicTextGap(5); buy.setTooltip(new javafx.scene.control.Tooltip("Spend 5 coins")); buy.getStyleClass().add("primary-button"); buy.setOnAction(event -> purchase(pass));
+        Button buy = new Button("5"); buy.setGraphic(createCoinIcon(16)); buy.setContentDisplay(javafx.scene.control.ContentDisplay.LEFT);
+        buy.setGraphicTextGap(6); buy.setPadding(new Insets(7, 12, 7, 10)); buy.setTooltip(new javafx.scene.control.Tooltip("Spend 5 coins")); buy.getStyleClass().add("primary-button"); buy.setOnAction(event -> purchase(pass));
         if (pass.isCustom()) {
             Button delete = new Button("Delete"); delete.getStyleClass().add("secondary-button");
             delete.setOnAction(event -> { if (blockManager.removeCustomPass(pass)) passes.getChildren().remove(card); });
