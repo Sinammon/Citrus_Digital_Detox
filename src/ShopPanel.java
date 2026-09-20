@@ -42,7 +42,15 @@ public class ShopPanel {
         HBox heading = new HBox(10, createAppIcon(service), new Label(pass.getDisplayName())); heading.setAlignment(Pos.CENTER_LEFT); heading.getChildren().get(1).getStyleClass().add("section-title");
         Label detail = new Label(pass.getDescription()); detail.getStyleClass().add("muted"); detail.setWrapText(true);
         Button buy = new Button("Buy for 5 coins"); buy.getStyleClass().add("primary-button"); buy.setOnAction(event -> purchase(pass));
-        card.getChildren().addAll(heading, detail, buy); return card;
+        if (pass.isCustom()) {
+            Button delete = new Button("Delete"); delete.getStyleClass().add("secondary-button");
+            delete.setOnAction(event -> { if (blockManager.removeCustomPass(pass)) passes.getChildren().remove(card); });
+            HBox actions = new HBox(8, buy, delete); actions.setAlignment(Pos.CENTER_LEFT);
+            card.getChildren().addAll(heading, detail, actions);
+        } else {
+            card.getChildren().addAll(heading, detail, buy);
+        }
+        return card;
     }
 
     private void showCustomPassForm() {

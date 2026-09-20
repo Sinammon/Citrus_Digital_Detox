@@ -45,6 +45,13 @@ public class UserEconomy {
     public synchronized void setCoins(int coins) { this.coins = Math.max(0, coins); }
     public synchronized LocalDate getCoinResetDate() { return coinResetDate; }
     public synchronized void setCoinResetDate(LocalDate date) { coinResetDate = date == null ? LocalDate.now() : date; }
+    public synchronized LocalDate getDailyMetricDate() { return dailyMetricDate; }
+    public synchronized boolean restoreDailyMetricDate(LocalDate date) {
+        boolean current = date != null && LocalDate.now().equals(date);
+        dailyMetricDate = current ? date : LocalDate.now();
+        if (!current) { totalProductiveSeconds = 0; dailyProductiveSeconds = 0; }
+        return current;
+    }
     public synchronized boolean resetCoinsIfNewDay() {
         LocalDate today = LocalDate.now();
         if (coinResetDate == null || !today.equals(coinResetDate)) {

@@ -12,6 +12,7 @@ public class BlockManager {
     private LocalDate metricDate = LocalDate.now();
 
     public void addPass(Pass pass) { passes.add(pass); }
+    public boolean removeCustomPass(Pass pass) { return pass != null && pass.isCustom() && passes.remove(pass); }
     public List<Pass> getPasses() { return passes; }
     public void setPasses(List<Pass> savedPasses) { passes.clear(); if (savedPasses != null) passes.addAll(savedPasses); }
     public List<Pass> getCustomPasses() { return passes.stream().filter(Pass::isCustom).toList(); }
@@ -36,6 +37,11 @@ public class BlockManager {
     }
     public synchronized Map<String, Integer> getTriggerCounts() { resetIfDateChanged(); return new LinkedHashMap<>(triggerCounts); }
     public synchronized void setTriggerCounts(Map<String, Integer> savedCounts) { triggerCounts.clear(); if (savedCounts != null) triggerCounts.putAll(savedCounts); }
+    public synchronized LocalDate getMetricDate() { return metricDate; }
+    public synchronized void restoreMetricDate(LocalDate savedDate) {
+        if (savedDate == null || !LocalDate.now().equals(savedDate)) { usageSeconds.clear(); triggerCounts.clear(); }
+        metricDate = LocalDate.now();
+    }
     public synchronized void resetDailyMetrics() { usageSeconds.clear(); triggerCounts.clear(); metricDate = LocalDate.now(); }
     private void resetIfDateChanged() { if (!LocalDate.now().equals(metricDate)) resetDailyMetrics(); }
 

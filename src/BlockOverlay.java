@@ -1,4 +1,5 @@
-import javafx.animation.PauseTransition;
+import javafx.animation.KeyFrame;
+import javafx.animation.Timeline;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
@@ -14,6 +15,7 @@ public class BlockOverlay {
     private final Block block;
     private final BlockManager blockManager;
     private final Stage stage = new Stage();
+    private Timeline delayCountdown;
 
     public BlockOverlay(Block block, BlockManager blockManager) {
         this.block = block; this.blockManager = blockManager;
@@ -43,10 +45,19 @@ public class BlockOverlay {
             shopOnly.getStyleClass().add("overlay-detail");
             root.getChildren().add(shopOnly);
         } else if (block.getLockType() == LockType.DELAY) {
-            Label wait = new Label("Your break opens in " + block.getDelaySeconds() + " seconds."); root.getChildren().add(wait);
-            PauseTransition pause = new PauseTransition(Duration.seconds(block.getDelaySeconds())); pause.setOnFinished(e -> unlock()); pause.play();
+            Label countdown = new Label(); countdown.getStyleClass().add("overlay-title");
+            int delaySeconds = Math.max(0, block.getDelaySeconds());
+            countdown.setText("Unlocking in " + delaySeconds + " seconds");
+            root.getChildren().add(countdown);
+            int[] remaining = {delaySeconds};
+            delayCountdown = new Timeline(new KeyFrame(Duration.seconds(1), event -> {
+                if (remaining[0] <= 1) { remaining[0] = 0; countdown.setText("Unlocking in 0 seconds"); delayCountdown.stop(); unlock(); }
+                else { remaining[0]--; countdown.setText("Unlocking in " + remaining[0] + " seconds"); }
+            }));
+            delayCountdown.setCycleCount(Math.max(1, delaySeconds));
+            if (delaySeconds == 0) unlock(); else delayCountdown.play();
         }
     }
-    private void unlock() { blockManager.addPass(new Pass(block.getTargetName(), 10)); stage.close(); }
-    public void dispose() { stage.close(); }
+    private void unlock() { if (delayCountdown != null) delayCountdown.stop(); blockManager.addPass(new Pass(block.getTargetName(), 10)); stage.close(); }
+    public void dispose() { if (delayCountdown != null) delayCountdown.stop(); stage.close(); }
 }

@@ -7,7 +7,7 @@ public class SaveManager {
         SaveData data = new SaveData(
                 blockManager.getBlocks(), blockManager.getPasses(), blockManager.getUsageSeconds(), blockManager.getTriggerCounts(),
                 economy.getCoins(), economy.getTotalProductiveSecondsRaw(), economy.getDailyProductiveSeconds(),
-                economy.getLifetimeProductiveSeconds(), economy.getSecondsPerCoin(), economy.getCoinResetDate());
+                economy.getLifetimeProductiveSeconds(), economy.getSecondsPerCoin(), economy.getCoinResetDate(), blockManager.getMetricDate());
         try (ObjectOutputStream out = new ObjectOutputStream(new FileOutputStream(FILE_NAME))) {
             out.writeObject(data);
         } catch (IOException e) { e.printStackTrace(); }
@@ -22,11 +22,15 @@ public class SaveManager {
             blockManager.setPasses(data.getPasses());
             blockManager.setUsageSeconds(data.getUsageSeconds());
             blockManager.setTriggerCounts(data.getTriggerCounts());
+            blockManager.restoreMetricDate(data.getMetricDate());
             economy.setCoins(data.getCoins());
             economy.setCoinResetDate(data.getCoinResetDate());
             economy.resetCoinsIfNewDay();
-            economy.setTotalProductiveSecondsRaw(data.getTotalProductiveSeconds());
-            economy.setDailyProductiveSeconds(data.getDailyProductiveSeconds());
+            boolean currentMetricDay = economy.restoreDailyMetricDate(data.getMetricDate());
+            if (currentMetricDay) {
+                economy.setTotalProductiveSecondsRaw(data.getTotalProductiveSeconds());
+                economy.setDailyProductiveSeconds(data.getDailyProductiveSeconds());
+            }
             economy.setSecondsPerCoin(data.getSecondsPerCoin());
             if (data.hasLifetimeProductiveSeconds()) economy.setLifetimeProductiveSeconds(data.getLifetimeProductiveSeconds());
             else economy.setLifetimeProductiveSeconds(data.getCoins() * (double) data.getSecondsPerCoin() + data.getTotalProductiveSeconds());
