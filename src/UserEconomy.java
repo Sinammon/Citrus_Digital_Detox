@@ -7,6 +7,7 @@ public class UserEconomy {
     private double dailyProductiveSeconds;
     private double lifetimeProductiveSeconds;
     private int secondsPerCoin = 360;
+    private double dailyGoalHours = 2.0;
     private LocalDate dailyMetricDate = LocalDate.now();
     private LocalDate coinResetDate = LocalDate.now();
 
@@ -75,6 +76,9 @@ public class UserEconomy {
     public synchronized void setLifetimeProductiveSeconds(double seconds) { this.lifetimeProductiveSeconds = Math.max(0, seconds); }
     public synchronized int getSecondsPerCoin() { return secondsPerCoin; }
     public synchronized void setSecondsPerCoin(int secondsPerCoin) { if (secondsPerCoin > 0) this.secondsPerCoin = secondsPerCoin; }
+    public synchronized double getDailyGoalHours() { return dailyGoalHours; }
+    public synchronized void setDailyGoalHours(double hours) { dailyGoalHours = Math.max(1.0, Math.min(10.0, hours)); }
+    public synchronized double getDailyGoalMinutes() { return dailyGoalHours * 60.0; }
     public synchronized int getCoins() { return coins; }
     public synchronized double getRemainingSecondsToNextCoin() { return secondsPerCoin - totalProductiveSeconds; }
     public synchronized void resetDailyMetrics() {

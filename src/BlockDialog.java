@@ -32,6 +32,8 @@ public class BlockDialog extends Dialog<Block> {
     private final Slider delay = slider(5, 600, 30, 5);
     private final Map<DayOfWeek, CheckBox> dayChecks = new EnumMap<>(DayOfWeek.class);
     private final Map<DayOfWeek, Spinner<Integer>[]> dayTimes = new EnumMap<>(DayOfWeek.class);
+    private Spinner<Integer> sharedStart;
+    private Spinner<Integer> sharedEnd;
     private final PasswordField password = new PasswordField();
 
     public BlockDialog(BlockManager blockManager) {
@@ -104,6 +106,7 @@ public class BlockDialog extends Dialog<Block> {
         Label heading = new Label("Active days and hours");
         heading.getStyleClass().add("section-title");
         schedule.getChildren().add(heading);
+        HBox days = new HBox(10);
         for (DayOfWeek day : DayOfWeek.values()) {
             CheckBox check = dayChecks.get(day);
             if (check == null) {
@@ -111,16 +114,15 @@ public class BlockDialog extends Dialog<Block> {
                 check.setSelected(true);
                 dayChecks.put(day, check);
             }
-            Spinner<Integer> start = new Spinner<>(0, 23, 9);
-            Spinner<Integer> end = new Spinner<>(0, 23, 17);
-            start.setPrefWidth(78); end.setPrefWidth(78);
-            dayTimes.put(day, new Spinner[]{start, end});
-            HBox row = new HBox(8, check, new Label("from"), start, new Label("to"), end);
-            row.setPadding(new Insets(2, 0, 2, 0));
-            row.setDisable(!check.isSelected());
-            schedule.getChildren().add(row);
-            check.selectedProperty().addListener((obs, oldValue, selected) -> row.setDisable(!selected));
+            days.getChildren().add(check);
         }
+        if (sharedStart == null) {
+            sharedStart = new Spinner<>(0, 23, 9); sharedStart.setPrefWidth(78);
+            sharedEnd = new Spinner<>(0, 23, 17); sharedEnd.setPrefWidth(78);
+        }
+        HBox hours = new HBox(8, new Label("Selected days from"), sharedStart, new Label("to"), sharedEnd);
+        hours.setAlignment(javafx.geometry.Pos.CENTER_LEFT);
+        schedule.getChildren().addAll(days, hours);
         return schedule;
     }
 
@@ -133,11 +135,11 @@ public class BlockDialog extends Dialog<Block> {
             case TIME_RANGE -> {
                 Map<DayOfWeek, Block.DaySchedule> schedule = new EnumMap<>(DayOfWeek.class);
                 EnumSet<DayOfWeek> selectedDays = EnumSet.noneOf(DayOfWeek.class);
+                int start = sharedStart.getValue();
+                int end = sharedEnd.getValue();
+                if (start == end) { warning("Start and end hours must be different."); return null; }
                 for (DayOfWeek day : DayOfWeek.values()) {
                     if (!dayChecks.get(day).isSelected()) continue;
-                    int start = dayTimes.get(day)[0].getValue();
-                    int end = dayTimes.get(day)[1].getValue();
-                    if (start == end) { warning("Start and end hours must be different for " + shortDay(day) + "."); return null; }
                     selectedDays.add(day);
                     schedule.put(day, new Block.DaySchedule(LocalTime.of(start, 0), LocalTime.of(end, 0)));
                 }

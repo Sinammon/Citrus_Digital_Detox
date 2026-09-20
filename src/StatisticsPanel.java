@@ -47,7 +47,7 @@ public class StatisticsPanel {
     }
 
     private void refresh() {
-        progress.setProgress(Math.min(economy.getTotalProductiveMinutes() / 120.0, 1));
+        progress.setProgress(Math.min(economy.getTotalProductiveMinutes() / economy.getDailyGoalMinutes(), 1));
         var counts = blockManager.getTriggerCounts();
         var activeCounts = counts.entrySet().stream().filter(entry -> entry.getValue() > 0).toList();
         if (needsRebuild(activeCounts)) rebuildChart(activeCounts);
@@ -92,7 +92,7 @@ public class StatisticsPanel {
     private void applySliceColors() {
         for (int i = 0; i < chartData.size(); i++) {
             Node slice = chartData.get(i).getNode();
-            if (slice != null) slice.setStyle("-fx-pie-color: " + palette[i % palette.length] + ";");
+            if (slice != null) slice.setStyle("-fx-pie-color: " + palette[i % palette.length] + "; -fx-stroke: transparent; -fx-border-color: transparent; -fx-border-width: 0;");
         }
     }
     private String titleCase(String value) { return value == null || value.isBlank() ? "App" : Character.toUpperCase(value.charAt(0)) + value.substring(1).toLowerCase(); }

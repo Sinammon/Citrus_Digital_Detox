@@ -17,10 +17,11 @@ public class SaveData implements Serializable {
     private int secondsPerCoin;
     private LocalDate coinResetDate;
     private LocalDate metricDate;
+    private double dailyGoalHours;
 
     public SaveData(List<Block> blocks, List<Pass> passes, Map<String, Long> usageSeconds, Map<String, Integer> triggerCounts, int coins,
                     double totalProductiveSeconds, double dailyProductiveSeconds,
-                    double lifetimeProductiveSeconds, int secondsPerCoin, LocalDate coinResetDate, LocalDate metricDate) {
+                    double lifetimeProductiveSeconds, int secondsPerCoin, LocalDate coinResetDate, LocalDate metricDate, double dailyGoalHours) {
         this.blocks = blocks;
         this.passes = passes;
         this.usageSeconds = usageSeconds;
@@ -33,6 +34,7 @@ public class SaveData implements Serializable {
         this.secondsPerCoin = secondsPerCoin;
         this.coinResetDate = coinResetDate;
         this.metricDate = metricDate;
+        this.dailyGoalHours = dailyGoalHours;
     }
 
     public List<Block> getBlocks() { return blocks; }
@@ -47,4 +49,5 @@ public class SaveData implements Serializable {
     public int getSecondsPerCoin() { return secondsPerCoin; }
     public LocalDate getCoinResetDate() { return coinResetDate; }
     public LocalDate getMetricDate() { return metricDate; }
+    public double getDailyGoalHours() { return dailyGoalHours; }
 }

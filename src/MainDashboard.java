@@ -5,6 +5,7 @@ import javafx.geometry.Pos;
 import javafx.scene.Group;
 import javafx.scene.Node;
 import javafx.scene.control.Label;
+import javafx.scene.control.ProgressBar;
 import javafx.scene.control.ToggleButton;
 import javafx.scene.control.ToggleGroup;
 import javafx.scene.layout.BorderPane;
@@ -159,15 +160,22 @@ public class MainDashboard {
         Label subtitle = new Label("Set boundaries for distracting apps, then earn coins while you stay focused.");
         subtitle.getStyleClass().add("hero-title");
         HBox metrics = new HBox(18);
-        metrics.getChildren().addAll(metricCard("Productive time", "time"), metricCard("Blocks active now", "blocks"),
-                staticCard("Daily goal", "2h 0m", "A gentle target for today"));
+        VBox productiveCard = metricCard("Productive time", "time");
+        VBox blocksCard = metricCard("Blocks active now", "blocks");
+        VBox goalCard = dailyGoalCard();
+        metrics.getChildren().addAll(productiveCard, blocksCard, goalCard);
         TutorialContent tutorial = new TutorialContent();
         TopAppsAnalytics analytics = new TopAppsAnalytics(blockManager);
         view.getChildren().addAll(subtitle, metrics, tutorial.getView(), analytics.getView());
         Timeline refresh = new Timeline(new KeyFrame(Duration.seconds(1), event -> {
             int minutes = (int) economy.getTotalProductiveMinutes();
-            ((Label) metrics.lookup("#time")).setText((minutes / 60) + "h " + (minutes % 60) + "m");
-            ((Label) metrics.lookup("#blocks")).setText(String.valueOf(blockManager.countActiveBlocks()));
+            ((Label) productiveCard.lookup("#time")).setText((minutes / 60) + "h " + (minutes % 60) + "m");
+            ((Label) blocksCard.lookup("#blocks")).setText(String.valueOf(blockManager.countActiveBlocks()));
+            double goalMinutes = economy.getDailyGoalMinutes();
+            ((ProgressBar) goalCard.lookup("#goal-progress")).setProgress(Math.min(minutes / goalMinutes, 1.0));
+            ((Label) goalCard.lookup("#goal-value")).setText(formatMinutes((int) goalMinutes));
+            int remaining = Math.max(0, (int) Math.ceil(goalMinutes - minutes));
+            ((Label) goalCard.lookup("#goal-detail")).setText(remaining == 0 ? "Daily goal complete" : formatMinutes(remaining) + " remaining");
             analytics.refresh();
         }));
         refresh.setCycleCount(Timeline.INDEFINITE);
@@ -179,6 +187,23 @@ public class MainDashboard {
         VBox card = staticCard(title, "0", "Live update");
         ((Label) card.lookup(".metric-value")).setId(id);
         return card;
+    }
+
+    private VBox dailyGoalCard() {
+        VBox card = new VBox(8);
+        card.getStyleClass().add("card");
+        card.setPrefWidth(230);
+        HBox.setHgrow(card, Priority.ALWAYS);
+        Label title = new Label("Daily goal"); title.getStyleClass().add("metric-label");
+        Label value = new Label(formatMinutes((int) economy.getDailyGoalMinutes())); value.setId("goal-value"); value.getStyleClass().add("metric-value");
+        ProgressBar progress = new ProgressBar(0); progress.setId("goal-progress"); progress.setMaxWidth(Double.MAX_VALUE);
+        Label detail = new Label(formatMinutes((int) economy.getDailyGoalMinutes()) + " remaining"); detail.setId("goal-detail"); detail.getStyleClass().add("muted");
+        card.getChildren().addAll(title, value, progress, detail);
+        return card;
+    }
+
+    private String formatMinutes(int minutes) {
+        return (minutes / 60) + "h " + (minutes % 60) + "m";
     }
 
     private VBox staticCard(String title, String value, String detail) {
