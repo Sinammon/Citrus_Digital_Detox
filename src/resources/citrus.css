@@ -67,6 +67,8 @@
 
 .page-frame { -fx-padding: 26px 30px 30px 30px; -fx-spacing: 18px; }
 .content { -fx-padding: 8px 0 0 0; -fx-spacing: 22px; }
+.settings-scroll { -fx-background-color: transparent; -fx-border-color: transparent; }
+.settings-scroll > .viewport { -fx-background-color: transparent; }
 .coin-chip { -fx-background-color: #FFF4C2; -fx-background-radius: 15px; -fx-padding: 8 13; -fx-font-weight: 700; }
 .coin-value { -fx-font-size: 17px; -fx-text-fill: #2A2A2A; }
 .coin-caption { -fx-font-size: 13px; -fx-text-fill: #6F7175; }

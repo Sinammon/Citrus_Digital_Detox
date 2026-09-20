@@ -24,7 +24,8 @@ public class BlockManager {
     }
     public void recordUsageForWindow(String activeWindowTitle, double seconds) {
         if (activeWindowTitle == null || activeWindowTitle.isBlank()) return;
-        recordUsage(activeWindowTitle.trim(), seconds);
+        String lower = activeWindowTitle.toLowerCase();
+        for (Block block : blocks) if (lower.contains(block.getTargetName().toLowerCase())) { recordUsage(block.getTargetName(), seconds); return; }
     }
     public synchronized Map<String, Long> getUsageSeconds() { resetIfDateChanged(); return new LinkedHashMap<>(usageSeconds); }
     public synchronized void setUsageSeconds(Map<String, Long> savedUsage) { usageSeconds.clear(); if (savedUsage != null) usageSeconds.putAll(savedUsage); }

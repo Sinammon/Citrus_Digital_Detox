@@ -2,6 +2,7 @@ import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.control.ScrollPane;
 import javafx.scene.control.Slider;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
@@ -40,6 +41,13 @@ public class SettingsPanel {
         coinCard.getChildren().addAll(title, description, sliderRow, save);
         VBox tutorial = new VBox(8); tutorial.getStyleClass().add("card"); Label tutorialTitle = new Label("How to use Citrus"); tutorialTitle.getStyleClass().add("section-title"); tutorial.getChildren().addAll(tutorialTitle, new TutorialContent().getView());
         VBox music = new VBox(8); music.getStyleClass().add("card"); music.getChildren().add(audioSettings.getView());
-        root.getChildren().addAll(goalCard, coinCard, tutorial, music); return root;
+        root.getChildren().addAll(goalCard, coinCard, tutorial, music);
+        ScrollPane scroll = new ScrollPane(root);
+        scroll.setFitToWidth(true);
+        scroll.setPannable(true);
+        scroll.setHbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
+        scroll.setVbarPolicy(ScrollPane.ScrollBarPolicy.AS_NEEDED);
+        scroll.getStyleClass().add("settings-scroll");
+        return scroll;
     }
 }
