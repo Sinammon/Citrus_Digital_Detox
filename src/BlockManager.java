@@ -50,6 +50,10 @@ public class BlockManager {
         return passes.stream().anyMatch(pass -> pass.isActive() && pass.getTargetName().equalsIgnoreCase(targetName));
     }
     public void addBlock(Block block) { blocks.add(block); }
+    public boolean hasActiveBlockForTarget(String targetName) {
+        if (targetName == null || targetName.isBlank()) return false;
+        return blocks.stream().anyMatch(block -> block.isActive() && block.getTargetName().equalsIgnoreCase(targetName.trim()));
+    }
     public void removeBlock(Block block) { blocks.remove(block); }
     public List<Block> getBlocks() { return blocks; }
     public int countActiveBlocks() { int count = 0; for (Block block : blocks) if (block.isCurrentlyBlocking()) count++; return count; }

@@ -1,6 +1,7 @@
 import javafx.collections.FXCollections;
 import javafx.geometry.Insets;
 import javafx.scene.control.Alert;
+import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ComboBox;
@@ -34,6 +35,7 @@ public class BlockDialog extends Dialog<Block> {
     private final Map<DayOfWeek, Spinner<Integer>[]> dayTimes = new EnumMap<>(DayOfWeek.class);
     private Spinner<Integer> sharedStart;
     private Spinner<Integer> sharedEnd;
+    private final Label rangeError = new Label();
     private final PasswordField password = new PasswordField();
 
     public BlockDialog(BlockManager blockManager) {
@@ -99,6 +101,8 @@ public class BlockDialog extends Dialog<Block> {
             case EMERGENCY -> options.getChildren().add(new HBox(14, new Label("Emergency password"), password));
             case PASS_BLOCK -> options.getChildren().add(new Label("This block can only be unlocked by purchasing a pass from the Shop."));
         }
+        Button ok = (Button) getDialogPane().lookupButton(ButtonType.OK);
+        if (ok != null) ok.setDisable(type.getValue() == LockType.TIME_RANGE && !isValidTimeRange());
     }
 
     private VBox createScheduleEditor() {
@@ -119,11 +123,29 @@ public class BlockDialog extends Dialog<Block> {
         if (sharedStart == null) {
             sharedStart = new Spinner<>(0, 23, 9); sharedStart.setPrefWidth(78);
             sharedEnd = new Spinner<>(0, 23, 17); sharedEnd.setPrefWidth(78);
+            sharedStart.valueProperty().addListener((obs, oldValue, newValue) -> updateRangeValidation());
+            sharedEnd.valueProperty().addListener((obs, oldValue, newValue) -> updateRangeValidation());
         }
         HBox hours = new HBox(8, new Label("Selected days from"), sharedStart, new Label("to"), sharedEnd);
         hours.setAlignment(javafx.geometry.Pos.CENTER_LEFT);
-        schedule.getChildren().addAll(days, hours);
+        rangeError.getStyleClass().add("overlay-error");
+        rangeError.setWrapText(true);
+        schedule.getChildren().addAll(days, hours, rangeError);
+        updateRangeValidation();
         return schedule;
+    }
+
+    private boolean isValidTimeRange() {
+        return sharedStart != null && sharedEnd != null && sharedEnd.getValue() > sharedStart.getValue();
+    }
+
+    private void updateRangeValidation() {
+        boolean valid = isValidTimeRange();
+        rangeError.setText(valid ? "" : "End time must be after start time.");
+        rangeError.setManaged(!valid);
+        rangeError.setVisible(!valid);
+        Button ok = (Button) getDialogPane().lookupButton(ButtonType.OK);
+        if (ok != null && type.getValue() == LockType.TIME_RANGE) ok.setDisable(!valid);
     }
 
     private Block createBlock() {
@@ -137,7 +159,7 @@ public class BlockDialog extends Dialog<Block> {
                 EnumSet<DayOfWeek> selectedDays = EnumSet.noneOf(DayOfWeek.class);
                 int start = sharedStart.getValue();
                 int end = sharedEnd.getValue();
-                if (start == end) { warning("Start and end hours must be different."); return null; }
+                if (!isValidTimeRange()) { warning("End time must be after start time."); return null; }
                 for (DayOfWeek day : DayOfWeek.values()) {
                     if (!dayChecks.get(day).isSelected()) continue;
                     selectedDays.add(day);
