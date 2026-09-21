@@ -25,7 +25,8 @@ public class ShopPanel {
     public Node getView() {
         VBox root = new VBox(18); root.getStyleClass().add("content");
         Label intro = new Label("Spend your earned coins on a planned break."); intro.getStyleClass().add("muted");
-        passes.setPadding(new Insets(4, 0, 0, 0)); passes.setPrefWrapLength(720);
+        passes.setPadding(new Insets(4, 0, 0, 0));
+        passes.setPrefWrapLength(720);
         passes.getChildren().clear();
         addBuiltIn("Youtube", "youtube"); addBuiltIn("Netflix", "netflix"); addBuiltIn("Spotify", "spotify");
         addBuiltIn("WhatsApp", "whatsapp"); addBuiltIn("Instagram", "instagram"); addBuiltIn("Discord", "discord");

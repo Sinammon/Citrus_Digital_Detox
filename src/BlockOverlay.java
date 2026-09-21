@@ -23,7 +23,7 @@ public class BlockOverlay {
         stage.setTitle(block.getTargetName());
         stage.setAlwaysOnTop(true);
         VBox root = new VBox(16); root.setAlignment(Pos.CENTER); root.getStyleClass().add("overlay");
-        Label heading = new Label("🍋 " + block.getTargetName() + " is blocked"); heading.getStyleClass().add("overlay-title");
+        Label heading = new Label(block.getTargetName() + " is blocked"); heading.getStyleClass().add("overlay-title");
         Label detail = new Label("Take a breath. Citrus is protecting your focus."); detail.getStyleClass().add("overlay-detail");
         root.getChildren().addAll(heading, detail); addUnlockControls(root);
         Scene scene = new Scene(root); scene.getStylesheets().add(getClass().getResource("/citrus.css").toExternalForm());
